@@ -24,6 +24,8 @@ int main(int argc, const char* argv[]){
 
 	writeChunk(&chunk, OP_RETURN, 125);
 	disassembleChunk(&chunk, "test chunk");
+
+	interpret(&chunk);
 	freeVM();
 	freeChunk(&chunk);
 

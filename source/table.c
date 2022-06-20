@@ -21,13 +21,36 @@ void freeTable(Table* table){
 
 static Entry* findEntry(Entry* entries, int capacity, ObjString* key){
     uint32_t index = key->hash % capacity;
+    Entry* tombstone = NULL;
+
     for(;;){
         Entry* entry = &entries[index];
-        if(entry->key == key || entry->key == NULL){
+        
+        if(entry->key == NULL){
+            if(IS_NIL(entry->value)){
+                return tombstone != NULL ? tombstone : entry;
+            }else{
+                if(tombstone == NULL) tombstone = entry;
+            }
+        }else if(entry->key == key){
             return entry;
         }
+
         index = (index + 1) % capacity;
     }
+}
+
+bool tableGet(Table* table, ObjString* key, Value* value){
+
+    if(table->count == 0) return false;
+
+    Entry* entry = findEntry(table->entries, table->capacity, key);
+
+    if(entry->key == NULL) return false;
+
+    *value = entry->value;
+
+    return true;
 }
 
 static void adjustCapacity(Table* table, int capacity){
@@ -65,6 +88,21 @@ bool tableSet(Table* table, ObjString* key, Value value){
     entry->key = key;
     entry->value = value;
     return isNewKey;
+}
+
+bool tableDelete(Table* table, ObjString* key){
+    if (table->count ==  0) return false;
+
+    // Find the entry
+
+    Entry* entry = findEntry(table->entries, table->capacity, key);
+    if(entry->key == NULL) return false;
+
+    // Place a tombstone in the entry
+
+    entry->key = NULL;
+    entry->value = BOOL_VAL(true);
+    return true;
 }
 
 void tableAddAll(Table* from, Table* to){

@@ -1,4 +1,4 @@
 var x = "farhan";
 var y = "saif";
-var c = x + " " + y;
-print c;
+x = x + " " + y;
+print x;

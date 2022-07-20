@@ -1,4 +1,7 @@
-var x = "farhan";
-var y = "saif";
-x = x + " " + y;
-print x;
+{
+    var a = "outer";
+    {
+	var a = a;
+    }
+    print a;
+}

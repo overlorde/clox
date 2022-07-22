@@ -128,7 +128,7 @@ static void emitBytes(uint8_t byte1, uint8_t byte2){
 static void emitLoop(int loopStart){
     emitByte(OP_LOOP);
 
-    int offset = currentChunk()->chunk - loopStart + 2;
+    int offset = currentChunk()->count - loopStart + 2;
     if(offset > UINT16_MAX) error("Loop body too large.");
 
     emitByte((offset>>8) & 0xff);
@@ -164,7 +164,7 @@ static void emitConstant(Value value){
 static void patchJump(int offset){
     // -2 to adjust for the bytecode for the jump offset itself
 
-    int jump = currentChunk()->chunk - offset - 2;
+    int jump = currentChunk()->count - offset - 2;
 
     if(jump > UINT16_MAX){
 	error("Too much code to jump over.");
@@ -286,6 +286,16 @@ static void defineVariable(uint8_t global){
 
 
     emitBytes(OP_DEFINE_GLOBAL, global);
+}
+
+static void and_(bool canAssign){
+    int endJump = emitJump(OP_JUMP_IF_FALSE);
+
+    emitByte(OP_POP);
+    parsePrecedence(PREC_AND);
+
+    patchJump(endJump);
+
 }
 
 static void binary(bool canAssign){

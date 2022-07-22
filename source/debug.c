@@ -36,7 +36,7 @@ static int jumpInstruction(const char* name, int sign, Chunk* chunk, int offset)
 
     jump |= chunk->code[offset + 2];
 
-    print("%-16s %4d -> %d\n", name, offset, offset + 3 + sign*jump);
+    printf("%-16s %4d -> %d\n", name, offset, offset + 3 + sign*jump);
 
     return offset + 3;
 }

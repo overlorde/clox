@@ -1,1 +1,1 @@
-
+vm.c, in interpret(), replace 10 lines
